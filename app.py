@@ -5,6 +5,18 @@ from transformers import pipeline
 from nltk.sentiment import SentimentIntensityAnalyzer
 from datetime import datetime, timedelta
 import traceback
+import os 
+
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except nltk.downloader.DownloadError:
+    nltk.download('punkt')
+try:
+    nltk.data.find('sentiment/vader_lexicon')
+except nltk.downloader.DownloadError:
+    nltk.download('vader_lexicon')
+
 
 # Import functions from our other modules
 from data_sourcing import clean_text_api, get_market_performance
@@ -12,22 +24,17 @@ from analysis import analyze_sentiment
 from visualizations import create_visualizations
 from reporting import generate_report_api, create_pdf_report
 
-# --- Configuration and Setup ---
+# Configuration and Setup 
 st.set_page_config(page_title="ECSA Tool", layout="wide")
 
-# --- API KEY ---
-# This is the CORRECT way to get the API key for deployment.
-# It reads the key you entered in the Streamlit Secrets manager.
+# API KEY 
+# Get the API key from Streamlit secrets
 API_KEY = st.secrets.get("API_KEY")
 
 # Caching models and data for performance
 @st.cache_resource
 def load_models_and_data():
-    """
-    Loads all necessary models and data files once.
-    The nltk.download calls are removed from here because the nltk.sh
-    script now handles the data download during deployment.
-    """
+    """Loads all necessary models and data files once."""
     try:
         lm_dict = pd.read_csv("LMMD.csv")
 
@@ -56,11 +63,10 @@ def load_models_and_data():
 
 models = load_models_and_data()
 
-# --- Streamlit User Interface ---
+#  Streamlit User Interface 
 st.title("📈 Earnings Call Sentiment Analyzer (ECSA)")
 st.markdown("Upload an earnings call transcript, provide the company ticker and call date, and get a full sentiment and market analysis report.")
 
-# Add a warning if the API key is not found in secrets
 if not API_KEY:
     st.warning("API key not found in Streamlit secrets. Text cleansing and AI report generation will be skipped.")
 
@@ -77,7 +83,7 @@ with col2:
     st.write("Click the button below to start the analysis.")
     analyze_button = st.button("🚀 Analyze and Generate Report", type="primary")
 
-# --- Main Analysis Workflow ---
+#  Main Analysis Workflow 
 if analyze_button:
     if not uploaded_file or not ticker or not call_date:
         st.error("Please provide all inputs: a transcript file, a ticker, and a date.")
@@ -129,5 +135,3 @@ if analyze_button:
             except Exception as e:
                 st.error(f"An unexpected error occurred during analysis: {e}")
                 st.code(traceback.format_exc())
-
-
