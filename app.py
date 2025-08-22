@@ -5,18 +5,12 @@ from transformers import pipeline
 from nltk.sentiment import SentimentIntensityAnalyzer
 from datetime import datetime, timedelta
 import traceback
-import os 
+import os
 
 
-try:
-    nltk.data.find('tokenizers/punkt')
-except nltk.downloader.DownloadError:
-    nltk.download('punkt')
-try:
-    nltk.data.find('sentiment/vader_lexicon')
-except nltk.downloader.DownloadError:
-    nltk.download('vader_lexicon')
 
+nltk.download('punkt')
+nltk.download('vader_lexicon')
 
 # Import functions from our other modules
 from data_sourcing import clean_text_api, get_market_performance
@@ -27,7 +21,7 @@ from reporting import generate_report_api, create_pdf_report
 # Configuration and Setup 
 st.set_page_config(page_title="ECSA Tool", layout="wide")
 
-# API KEY 
+#  API KEY 
 # Get the API key from Streamlit secrets
 API_KEY = st.secrets.get("API_KEY")
 
@@ -83,7 +77,7 @@ with col2:
     st.write("Click the button below to start the analysis.")
     analyze_button = st.button("🚀 Analyze and Generate Report", type="primary")
 
-#  Main Analysis Workflow 
+# Main Analysis Workflow 
 if analyze_button:
     if not uploaded_file or not ticker or not call_date:
         st.error("Please provide all inputs: a transcript file, a ticker, and a date.")
@@ -135,3 +129,4 @@ if analyze_button:
             except Exception as e:
                 st.error(f"An unexpected error occurred during analysis: {e}")
                 st.code(traceback.format_exc())
+
