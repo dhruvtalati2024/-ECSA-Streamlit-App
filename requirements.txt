@@ -3,10 +3,10 @@ pandas
 yfinance
 requests
 nltk
-transformers==4.36.2
-torch==2.2.2
+transformers
+torch
 accelerate
-numpy==1.26.4
+numpy
 matplotlib
 reportlab
 wordcloud
