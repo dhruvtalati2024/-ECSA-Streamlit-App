@@ -15,17 +15,20 @@ from reporting import generate_report_api, create_pdf_report
 # --- Configuration and Setup ---
 st.set_page_config(page_title="ECSA Tool", layout="wide")
 
-# --- API KEY (Hardcoded as requested) ---
-API_KEY = "xai-6jSdlT02NVgAZDylmMPOfHVLLFH1xTugFfqRCfVUlYHxj1Yt1kFmBs1Jex2R7rT6opSyoH7GvvuKYEL2"
+# --- API KEY ---
+# This is the CORRECT way to get the API key for deployment.
+# It reads the key you entered in the Streamlit Secrets manager.
+API_KEY = st.secrets.get("API_KEY")
 
 # Caching models and data for performance
 @st.cache_resource
 def load_models_and_data():
-    """Loads all necessary models and data files once."""
+    """
+    Loads all necessary models and data files once.
+    The nltk.download calls are removed from here because the nltk.sh
+    script now handles the data download during deployment.
+    """
     try:
-        nltk.download('punkt', quiet=True)
-        nltk.download('vader_lexicon', quiet=True)
-
         lm_dict = pd.read_csv("LMMD.csv")
 
         lm_positive_words = set(lm_dict[lm_dict['Positive'] > 0]['Word'].str.lower())
@@ -56,6 +59,10 @@ models = load_models_and_data()
 # --- Streamlit User Interface ---
 st.title("📈 Earnings Call Sentiment Analyzer (ECSA)")
 st.markdown("Upload an earnings call transcript, provide the company ticker and call date, and get a full sentiment and market analysis report.")
+
+# Add a warning if the API key is not found in secrets
+if not API_KEY:
+    st.warning("API key not found in Streamlit secrets. Text cleansing and AI report generation will be skipped.")
 
 col1, col2 = st.columns(2)
 
@@ -122,3 +129,5 @@ if analyze_button:
             except Exception as e:
                 st.error(f"An unexpected error occurred during analysis: {e}")
                 st.code(traceback.format_exc())
+
+
