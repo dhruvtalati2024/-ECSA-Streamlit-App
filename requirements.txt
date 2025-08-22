@@ -1,0 +1,12 @@
+streamlit
+pandas
+yfinance
+requests
+nltk
+transformers==4.36.2
+torch==2.2.2
+accelerate
+numpy==1.26.4
+matplotlib
+reportlab
+wordcloud
